@@ -1,43 +1,40 @@
 package com.draglantix.central;
 
+import java.util.Arrays;
+
+import com.draglantix.util.DataHandler;
+import com.draglantix.util.Reader;
+
 public class Interfacer {
 
-	public Interfacer(double a, double b) {
+	public Interfacer() {
 		System.out.println("NeuroText v" + Config.VERSION + " now booting...");
-//		String raw = Reader.loadFileAsString("config.dat");
-//		String[] tokens = raw.split("\\s+");
-//		Config.MODE = Reader.parseInt(tokens[0]);
-//		Config.prompt = Reader.loadFileAsString(tokens[1]);
-//		Config.network = tokens[2];
-		
-		NeuralNetwork nn = new NeuralNetwork(1000000, 0.1);
-		
-		double[] input = new double[2];
-		
-		input[0] = a;
-		input[1] = b;
-		
-		System.out.println(nn.compute(input)[0]);
-//		
-//		if(Config.MODE == 0) {
-//			write();
-//		}else {
-//			learn();
-//		}
+		String raw = Reader.loadFileAsString("config.dat");
+		String[] tokens = raw.split("\\s+");
+		Config.MODE = Integer.parseInt(tokens[0]);
+		Config.prompt = Reader.loadFileAsString(tokens[1]);
+		Config.network = tokens[2];
+		Config.epochs = Integer.parseInt(tokens[3]);
+		Config.learnRate = Double.parseDouble(tokens[4]);
+		begin();
 	}
 	
-//	private void write() {
-//		System.out.println("Loading Neural Network...");
-//		String raw = Reader.loadFileAsString(Config.network + ".ntwk");
-//		String[] tokens = raw.split("\\s+");
-//	}
-//	
-//	private void learn() {
-//		
-//	}
+	private void begin() {
+		NeuralNetwork nn;
+		
+		if(Config.MODE == 0) {
+			nn = new NeuralNetwork(Config.epochs, Config.learnRate);
+		}else {
+			nn = new NeuralNetwork();
+		}
+		
+		double[] result = nn.compute(DataHandler.toArray(Arrays.deepToString(Config.prompt.split("\\s+"))));
+		
+		System.out.println(Arrays.toString(result));
+	}
 	
 	public static void main(String[] args) {
-		new Interfacer(Double.parseDouble(args[0]), Double.parseDouble(args[1]));
+		new Interfacer();
 	}
 	
 }

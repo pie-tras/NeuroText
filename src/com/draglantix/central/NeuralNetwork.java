@@ -1,8 +1,13 @@
 package com.draglantix.central;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
+
+import com.draglantix.util.DataHandler;
+import com.draglantix.util.Reader;
+import com.draglantix.util.Writer;
 
 public class NeuralNetwork {
 	
@@ -21,9 +26,6 @@ public class NeuralNetwork {
 	private double[][] hiddenLayerWeights = new double[inputCount][hiddenCount];
 	private double[][] outputLayerWeights = new double[hiddenCount][outputCount];
 	
-//	private double error;
-//	private int c = 0;
-	
 	public NeuralNetwork(int epochs, double learnRate) {
 		System.out.println("Creating Neural Network...");
 		initModel();
@@ -34,6 +36,8 @@ public class NeuralNetwork {
 		
 		System.out.println("Learning...");
 		
+		int updater = 0;
+		
 		for(int n = 0; n < epochs; n++) {
 			Collections.shuffle(Arrays.asList(trainOrder));
 			
@@ -43,15 +47,47 @@ public class NeuralNetwork {
 				backPropogate(trainInput[i], trainOutput[i], learnRate);
 			}
 			
-//			if(c == 100) {
-//				System.out.println(error);
-//				c = 0;
-//			}
-//			c++;
+			if(updater == 1000000) {
+				System.out.println(((float)(n)/(epochs-1))*100 + "%");
+				updater = 0;
+			}
+			updater++;
 		}
 		
 		System.out.println("Learning Finished...");
 		
+		File f = Writer.CreateFile(Config.network + ".ntwk");
+		String save = "";
+		
+		save += Arrays.toString(hiddenLayer);
+		save += "/";
+		save += Arrays.toString(outputLayer);
+		save += "/";
+		
+		save += Arrays.toString(hiddenLayerBias);
+		save += "/";
+		save += Arrays.toString(outputLayerBias);
+		save += "/";
+		
+		save += Arrays.deepToString(hiddenLayerWeights);
+		save += "/";
+		save += Arrays.deepToString(outputLayerWeights);
+		save += "/";
+		
+		Writer.WriteFile(f, save);
+	}
+	
+	public NeuralNetwork() {
+		String raw = Reader.loadFileAsString(Config.network + ".ntwk");
+		String[] arrays = raw.split("/");
+		this.hiddenLayer = DataHandler.toArray(arrays[0]);
+		this.outputLayer = DataHandler.toArray(arrays[1]);
+		
+		this.hiddenLayerBias = DataHandler.toArray(arrays[2]);
+		this.outputLayerBias = DataHandler.toArray(arrays[3]);
+		
+		this.hiddenLayerWeights = DataHandler.toDoubleArray(arrays[4]);
+		this.outputLayerWeights = DataHandler.toDoubleArray(arrays[5]);
 	}
 	
 	public double[] compute(double[] inputs) {

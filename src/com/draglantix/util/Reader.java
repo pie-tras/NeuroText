@@ -29,19 +29,4 @@ public class Reader {
 		return builder.toString();
 	}
 
-	/**
-	 * Converts a String to an int.
-	 * 
-	 * @param number String - The number as as a String
-	 * @return int - The number as an int
-	 */
-	public static int parseInt(String number) {
-		try {
-			return Integer.parseInt(number);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-			return 0;
-		}
-	}
-
 }
